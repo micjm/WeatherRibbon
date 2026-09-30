@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 import { MID_DAY, YEAR } from './seasonal'
 import {
   MONTH_START_DAY,
@@ -233,9 +234,7 @@ export function SeasonalRibbonChart({
         {dry ? ' · No measurable precipitation; ribbon drawn as a thread.' : ''}
       </p>
 
-      <details className="hourly-details">
-        <summary>View ribbon data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} ribbon`}>
           <table>
             <caption className="sr-only">
               {name} monthly mean temperature in degrees Fahrenheit and
@@ -262,8 +261,7 @@ export function SeasonalRibbonChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

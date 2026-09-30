@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -197,9 +198,7 @@ export function HumidityComfortChart({
         dew point)
       </p>
 
-      <details className="hourly-details">
-        <summary>View humidity comfort data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} humidity`}>
           <table>
             <caption className="sr-only">
               {name} monthly percentage of time in each dew-point comfort band
@@ -227,8 +226,7 @@ export function HumidityComfortChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

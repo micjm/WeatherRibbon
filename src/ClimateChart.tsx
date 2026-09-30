@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -229,9 +230,7 @@ export function ClimateChart({
         {Math.round(swings[swingIdx])}&deg;F)
       </p>
 
-      <details className="hourly-details">
-        <summary>View climate data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} climate`}>
           <table>
             <caption className="sr-only">
               {name} monthly average high, low, and precipitation
@@ -255,8 +254,7 @@ export function ClimateChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

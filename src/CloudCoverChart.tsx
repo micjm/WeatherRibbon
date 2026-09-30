@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -188,9 +189,7 @@ export function CloudCoverChart({
         Cloudiest {cloudiestMonth.month} ({cloudiestMonth.cloud}% cloud)
       </p>
 
-      <details className="hourly-details">
-        <summary>View cloud cover data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} cloud cover`}>
           <table>
             <caption className="sr-only">
               {name} monthly percentage of time in each cloud cover category
@@ -218,8 +217,7 @@ export function CloudCoverChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

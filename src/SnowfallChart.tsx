@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -161,9 +162,7 @@ export function SnowfallChart({
         Least {least.month} ({least.snowfall.toFixed(2)} in)
       </p>
 
-      <details className="hourly-details">
-        <summary>View snowfall data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} snowfall`}>
           <table>
             <caption className="sr-only">
               {name} monthly snowfall totals in inches with 20th to 80th
@@ -188,8 +187,7 @@ export function SnowfallChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

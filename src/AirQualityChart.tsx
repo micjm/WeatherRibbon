@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { DataDetails } from './DataDetails'
 import type { CityRef } from './cities'
 import { AQI_CATEGORIES, aqiCategory, useAirQuality } from './airQuality'
 import { YEAR, MID_DAY, sampleYear, lineFrom } from './seasonal'
@@ -212,9 +213,7 @@ export function AirQualityChart({
       </p>
       <p className="panel-note aqi-advice">{annualCat.advice}</p>
 
-      <details className="hourly-details">
-        <summary>View monthly air quality data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} air quality`}>
           <table>
             <caption className="sr-only">
               {name} monthly mean air quality index, PM2.5, PM10, and ozone
@@ -242,8 +241,7 @@ export function AirQualityChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

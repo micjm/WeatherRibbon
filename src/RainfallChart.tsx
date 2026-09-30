@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -188,9 +189,7 @@ export function RainfallChart({
         )}
       </p>
 
-      <details className="hourly-details">
-        <summary>View rainfall data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} rainfall`}>
           <table>
             <caption className="sr-only">
               {name} monthly rainfall totals in inches with 20th to 80th
@@ -215,8 +214,7 @@ export function RainfallChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

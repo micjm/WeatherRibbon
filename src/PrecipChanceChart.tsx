@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -167,9 +168,7 @@ export function PrecipChanceChart({
         {wetPct[driestIdx].toFixed(0)}%)
       </p>
 
-      <details className="hourly-details">
-        <summary>View wet vs dry data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} wet vs dry`}>
           <table>
             <caption className="sr-only">
               {name} share of rainy, mixed, snowy, and dry days per month
@@ -195,8 +194,7 @@ export function PrecipChanceChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

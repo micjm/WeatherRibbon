@@ -6,10 +6,25 @@ import {
   useState,
   type KeyboardEvent,
 } from 'react'
-import { CITIES, cityHref, type CityRef } from './cities'
+import { CITIES, cityHref, bySlug, type CityRef } from './cities'
 import { ribbonSrc } from './ribbonAssets'
 
-const RANKED: CityRef[] = CITIES
+const FEATURED_SLUGS = [
+  'new-york',
+  'london',
+  'tokyo',
+  'paris',
+  'los-angeles',
+  'singapore',
+  'dubai',
+  'rio-de-janeiro',
+  'mumbai',
+  'chicago',
+]
+
+const RANKED: CityRef[] = FEATURED_SLUGS
+  .map((slug) => bySlug.get(slug))
+  .filter((c): c is CityRef => c !== undefined)
 const ALPHABETICAL: CityRef[] = [...CITIES].sort((a, b) =>
   a.name.localeCompare(b.name, 'en'),
 )
@@ -106,26 +121,6 @@ export function CityIndex({ query, onQueryChange, onNavigate }: IndexViewProps) 
   return (
     <div className="index">
       <section className="index-hero">
-        <h1 className="index-title">
-          <svg className="index-brand-icon" aria-hidden="true">
-            <use href="/icons.svg#brand-icon" />
-          </svg>
-          ⛅ Weatherfork
-        </h1>
-        <p className="index-subtitle">
-          1991–2020 climate normals for {CITIES.length} cities worldwide.
-        </p>
-        <ul className="index-motifs" aria-hidden="true">
-          <li>
-            <svg><use href="/icons.svg#sun-icon" /></svg>
-          </li>
-          <li>
-            <svg><use href="/icons.svg#rain-icon" /></svg>
-          </li>
-          <li>
-            <svg><use href="/icons.svg#wind-icon" /></svg>
-          </li>
-        </ul>
         <div className="index-search-wrap">
           <label className="sr-only" htmlFor={`${id}-search`}>
             Search cities by name or state
@@ -217,7 +212,7 @@ export function CityIndex({ query, onQueryChange, onNavigate }: IndexViewProps) 
           <section className="index-ranked">
             <h2 className="index-section-title">Featured</h2>
             <ul className="city-grid">
-              {RANKED.map((city) => (
+              {RANKED.slice(0, 10).map((city) => (
                 <li key={city.slug ?? city.name}>
                   <CityCard city={city} onSelect={select} />
                 </li>

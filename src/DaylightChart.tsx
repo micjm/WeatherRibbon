@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { daylightHours, YEAR } from './solar'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -147,9 +148,7 @@ export function DaylightChart({
         &middot; {hemisphere}ern hemisphere
       </p>
 
-      <details className="hourly-details">
-        <summary>View daylight hours</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} daylight`}>
           <table>
             <caption className="sr-only">
               {name} mid-month hours of daylight
@@ -169,8 +168,7 @@ export function DaylightChart({
               ))}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

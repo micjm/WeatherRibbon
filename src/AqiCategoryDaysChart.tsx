@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { DataDetails } from './DataDetails'
 import type { CityRef } from './cities'
 import { AQI_CATEGORIES, useAirQuality } from './airQuality'
 import { DAYS_IN_MONTH } from './seasonal'
@@ -169,9 +170,7 @@ export function AqiCategoryDaysChart({
         &middot; {yearDays} days
       </p>
 
-      <details className="hourly-details">
-        <summary>View AQI category days</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} aqi days`}>
           <table>
             <caption className="sr-only">
               {name} days in each EPA air quality category by month
@@ -206,8 +205,7 @@ export function AqiCategoryDaysChart({
               </tr>
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

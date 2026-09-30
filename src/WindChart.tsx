@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { ClimateMonth, WindRoseMonth } from './dataService'
+import { DataDetails } from './DataDetails'
 
 const WIDTH = 640
 const HEIGHT = 300
@@ -222,9 +223,7 @@ export function WindChart({
         Calmest {calmest.month} ({calmest.wind.toFixed(1)} mph)
       </p>
 
-      <details className="hourly-details">
-        <summary>View wind data</summary>
-        <div className="hourly-table-wrap" tabIndex={0}>
+      <DataDetails filename={`${name} wind`}>
           <table>
             <caption className="sr-only">
               {name} monthly mean wind speed in miles per hour
@@ -258,8 +257,7 @@ export function WindChart({
               })}
             </tbody>
           </table>
-        </div>
-      </details>
+      </DataDetails>
     </section>
   )
 }

@@ -18,13 +18,7 @@ import { useHashRoute } from './useHashRoute'
 import { routeToCity } from './router'
 import './App.css'
 
-function CityView({
-  city,
-  onBack,
-}: {
-  city: CityRef
-  onBack: () => void
-}) {
+function CityView({ city }: { city: CityRef }) {
   const [data, setData] = useState<CityData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,11 +46,6 @@ function CityView({
 
   return (
     <>
-      <div className="city-back-row">
-        <button type="button" className="back-btn" onClick={onBack}>
-          ← Back to cities
-        </button>
-      </div>
       {data ? (
         <div className="weather">
           <section className="card" aria-label="About this data">
@@ -108,24 +97,24 @@ function App() {
 
   return (
     <div className="shell">
-      <header className="header">
-        <a
-          className="brand"
-          href="#/"
-          onClick={(e) => {
-            e.preventDefault()
-            navigate({ view: 'index', query: '' })
-          }}
-        >
-          <svg className="brand-icon" aria-hidden="true">
-            <use href="/icons.svg#brand-icon" />
-          </svg>
-          Weatherfork
-        </a>
-        {city && (
+      {route.view !== 'index' && (
+        <header className="header">
+          <a
+            className="brand"
+            href="#/"
+            onClick={(e) => {
+              e.preventDefault()
+              navigate({ view: 'index', query: '' })
+            }}
+          >
+            <svg className="brand-icon" aria-hidden="true">
+              <use href="/icons.svg#brand-icon" />
+            </svg>
+            Weatherfork
+          </a>
           <a
             className="header-back"
-            href={city ? '#/' : undefined}
+            href="#/"
             onClick={(e) => {
               e.preventDefault()
               navigate({ view: 'index', query: '' })
@@ -133,8 +122,8 @@ function App() {
           >
             ← All cities
           </a>
-        )}
-      </header>
+        </header>
+      )}
 
       <main className="main">
         {route.view === 'index' ? (
@@ -149,7 +138,6 @@ function App() {
           <CityView
             key={`${city.latitude.toFixed(2)},${city.longitude.toFixed(2)}`}
             city={city}
-            onBack={() => navigate({ view: 'index', query: '' })}
           />
         ) : (
           <article className="card muted">
