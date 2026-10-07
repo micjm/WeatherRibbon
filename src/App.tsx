@@ -14,8 +14,8 @@ import { DaylightChart } from './DaylightChart'
 import { WindChart } from './WindChart'
 import { CityIndex } from './CityIndex'
 import { loadCity, type CityData, type CityRef } from './dataService'
-import { useHashRoute } from './useHashRoute'
-import { routeToCity } from './router'
+import { useRoute } from './useRoute'
+import { parseRoute, routeToCity } from './router'
 import './App.css'
 
 function CityView({ city }: { city: CityRef }) {
@@ -91,7 +91,7 @@ function CityView({ city }: { city: CityRef }) {
 }
 
 function App() {
-  const [route, navigate] = useHashRoute()
+  const [route, navigate] = useRoute()
 
   const city = useMemo<CityRef | null>(() => routeToCity(route), [route])
 
@@ -101,7 +101,7 @@ function App() {
         <header className="header">
           <a
             className="brand"
-            href="#/"
+            href="/"
             onClick={(e) => {
               e.preventDefault()
               navigate({ view: 'index', query: '' })
@@ -114,7 +114,7 @@ function App() {
           </a>
           <a
             className="header-back"
-            href="#/"
+            href="/"
             onClick={(e) => {
               e.preventDefault()
               navigate({ view: 'index', query: '' })
@@ -130,8 +130,8 @@ function App() {
           <CityIndex
             query={route.query}
             onQueryChange={(q) => navigate({ view: 'index', query: q })}
-            onNavigate={(hash) => {
-              window.location.hash = hash
+            onNavigate={(href) => {
+              navigate(parseRoute(href))
             }}
           />
         ) : city ? (
@@ -145,7 +145,7 @@ function App() {
             <p>
               That city link is not available.{' '}
               <a
-                href="#/"
+                href="/"
                 onClick={(e) => {
                   e.preventDefault()
                   navigate({ view: 'index', query: '' })

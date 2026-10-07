@@ -57,7 +57,7 @@ function CityCard({
 interface IndexViewProps {
   query: string
   onQueryChange: (q: string) => void
-  onNavigate: (hash: string) => void
+  onNavigate: (href: string) => void
 }
 
 export function CityIndex({ query, onQueryChange, onNavigate }: IndexViewProps) {

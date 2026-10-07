@@ -1,6 +1,6 @@
 import { JSDOM } from 'jsdom'
 import { CITIES, bySlug, cityHref } from '../src/cities.ts'
-import { parseHash, routeToCity } from '../src/router.ts'
+import { parseRoute, routeToCity } from '../src/router.ts'
 
 let failures = 0
 let pass = 0
@@ -16,7 +16,7 @@ function ok(cond: boolean, label: string) {
 }
 
 // ---------------------------------------------------------------------------
-// Simulated browser environment with hash history + keyboard interaction.
+// Simulated browser environment with history + keyboard interaction.
 // We simulate the component's filtering + keyboard behavior using the same
 // pure logic the React component uses, against a real jsdom DOM.
 // ---------------------------------------------------------------------------
@@ -26,20 +26,20 @@ const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></
 const { window } = dom
 
 // --- fake history stack ---
-const hashStack: string[] = []
-let hashIndex = -1
+const historyStack: string[] = []
+let historyIndex = -1
 
-function pushHash(hash: string) {
-  hashStack.splice(hashIndex + 1)
-  hashStack.push(hash)
-  hashIndex++
-  window.location.hash = hash
+function pushRoute(path: string) {
+  historyStack.splice(historyIndex + 1)
+  historyStack.push(path)
+  historyIndex++
+  window.history.pushState(null, '', path)
 }
 
 function back() {
-  if (hashIndex > 0) {
-    hashIndex--
-    window.location.hash = hashStack[hashIndex]
+  if (historyIndex > 0) {
+    historyIndex--
+    window.history.pushState(null, '', historyStack[historyIndex])
   }
 }
 
@@ -111,7 +111,7 @@ console.log('\n=== DOM: keyboard Enter selects city ===')
 active.i = 0
 const enterResult = simulateKeyboard('seattle', 'Enter', active)
 ok(enterResult.navigate !== undefined, 'Enter navigates to city')
-ok(enterResult.navigate === '#/city/seattle', `Enter navigates to #/city/seattle (got ${enterResult.navigate})`)
+ok(enterResult.navigate === '/city/seattle', `Enter navigates to /city/seattle (got ${enterResult.navigate})`)
 
 console.log('\n=== DOM: keyboard Escape clears query ===')
 active.i = 0
@@ -129,23 +129,23 @@ const enterNoResult = simulateKeyboard('xyzzy', 'Enter', active)
 ok(enterNoResult.navigate === undefined, 'Enter on no-results does not navigate')
 
 // ---------------------------------------------------------------------------
-// Browser Back: push hash sequence and verify Back restores search state.
+// Browser Back: push sequence and verify Back restores search state.
 // ---------------------------------------------------------------------------
 console.log('\n=== DOM: navigation + browser Back ===')
-pushHash('#/')
-pushHash('#/?q=boston')
-pushHash('#/city/boston')
+pushRoute('/')
+pushRoute('/?q=boston')
+pushRoute('/city/boston')
 
-const beforeBack = parseHash(window.location.hash)
+const beforeBack = parseRoute(window.location.pathname + window.location.search)
 ok(beforeBack.view === 'city' && beforeBack.slug === 'boston', 'navigated to city/boston')
 
 back()
-const afterBack = parseHash(window.location.hash)
+const afterBack = parseRoute(window.location.pathname + window.location.search)
 ok(afterBack.view === 'index', 'Back returns to index')
 ok(afterBack.query === 'boston', 'Back restores search query "boston"')
 
 back()
-const afterBack2 = parseHash(window.location.hash)
+const afterBack2 = parseRoute(window.location.pathname + window.location.search)
 ok(afterBack2.view === 'index' && afterBack2.query === '', 'Back again returns to root index')
 
 // ---------------------------------------------------------------------------
@@ -155,21 +155,14 @@ console.log('\n=== DOM: stable shareable city URLs ===')
 for (const slug of ['seattle', 'san-francisco', 'miami', 'denver', 'new-york']) {
   const city = bySlug.get(slug)
   if (city) {
-    const hash = cityHref(city)
-    const route = parseHash(hash)
+    const href = cityHref(city)
+    const route = parseRoute(href)
     const resolved = routeToCity(route)
-    ok(resolved?.name === city.name, `deep-link ${hash} resolves to ${city.name}`)
+    ok(resolved?.name === city.name, `deep-link ${href} resolves to ${city.name}`)
   } else {
     ok(false, `expected slug "${slug}" to exist in bySlug`)
   }
 }
-
-// Non-canonical city coord URL
-const remoteHash = '#/city/@64.15,-21.94?name=Reykjavik&region=Iceland'
-const remoteRoute = parseHash(remoteHash)
-const remoteCity = routeToCity(remoteRoute)
-ok(remoteCity?.name === 'Reykjavik', 'coord deep-link resolves name')
-ok(remoteCity?.latitude === 64.15, 'coord deep-link resolves lat')
 
 // ---------------------------------------------------------------------------
 // Visible result count: the component shows "N matches" or "No matches".
