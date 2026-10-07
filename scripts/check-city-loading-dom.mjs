@@ -140,7 +140,7 @@ async function runChecks(App, ChartPlaceholder) {
         return request.promise
       },
     }
-    window.history.replaceState(null, '', `#/city/${slug}`)
+    window.history.replaceState(null, '', `/city/${slug}`)
     const host = document.createElement('div')
     document.body.appendChild(host)
     const errors = []
@@ -167,10 +167,10 @@ async function runChecks(App, ChartPlaceholder) {
         climateRequests,
         aqiRequests,
         unmount,
-        async navigate(hash) {
+        async navigate(path) {
           await act(async () => {
-            window.history.replaceState(null, '', hash)
-            window.dispatchEvent(new window.HashChangeEvent('hashchange'))
+            window.history.replaceState(null, '', path)
+            window.dispatchEvent(new window.PopStateEvent('popstate'))
           })
         },
       })
@@ -331,7 +331,7 @@ async function runChecks(App, ChartPlaceholder) {
       withApp('seattle', async ({ host, climateRequests, aqiRequests, navigate }) => {
         const oldClimate = climateRequest(climateRequests, 'seattle')
         const oldAir = requestsFor(aqiRequests, 'seattle')
-        await navigate('#/city/boston')
+        await navigate('/city/boston')
         pending(host, 'Boston')
         assert.equal(oldClimate.signal.aborted, true, 'leaving the city aborts its climate request')
         const current = climateRequest(climateRequests, 'boston')
@@ -373,7 +373,7 @@ async function runChecks(App, ChartPlaceholder) {
   await check('leaving for the index prevents late results from restoring city cards', () =>
     withApp('seattle', async ({ host, climateRequests, aqiRequests, navigate }) => {
       const climate = climateRequest(climateRequests, 'seattle')
-      await navigate('#/')
+      await navigate('/')
       assert.ok(host.querySelector('.index'))
       assert.equal(climate.signal.aborted, true)
       const before = host.innerHTML

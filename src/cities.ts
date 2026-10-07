@@ -166,6 +166,6 @@ export function citySlug(city: CityRef): string | undefined {
 }
 
 export function cityHref(city: CityRef): string {
-  const slug = citySlug(city)
-  return slug ? `#/city/${slug}` : '#/'
+  const slug = citySlug(city) ?? city.slug
+  return slug ? `/city/${slug}` : '/'
 }

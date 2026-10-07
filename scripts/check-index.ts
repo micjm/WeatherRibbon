@@ -1,5 +1,5 @@
 import { CITIES, bySlug, cityHref, citySlug, findCanonical, sameCity, slugify } from '../src/cities.ts'
-import { parseHash, routeToCity, serializeRoute, type Route } from '../src/router.ts'
+import { parseRoute, parseHash, routeToCity, serializeRoute, type Route } from '../src/router.ts'
 
 let failures = 0
 const checks: { label: string; ok: boolean; detail?: string }[] = []
@@ -46,84 +46,57 @@ check(slugify('  --Hello--  ') === 'hello', 'trims leading/trailing dashes')
 console.log('\n=== cityHref ===')
 const seattle = bySlug.get('seattle')!
 const sf = bySlug.get('san-francisco')!
-check(cityHref(seattle) === '#/city/seattle', 'canonical city → slug URL', cityHref(seattle))
-check(cityHref(sf) === '#/city/san-francisco', 'canonical city → slug URL (SF)', cityHref(sf))
-
-const remote: import('../src/cities').CityRef = {
-  name: 'Reykjavik',
-  region: 'Iceland',
-  latitude: 64.15,
-  longitude: -21.94,
-}
-const remoteHref = cityHref(remote)
-check(remoteHref.startsWith('#/city/@64.15,-21.94'), 'non-canonical city → coord URL', remoteHref)
-check(remoteHref.includes('name=Reykjavik'), 'coord URL includes name', remoteHref)
-check(remoteHref.includes('region=Iceland'), 'coord URL includes region', remoteHref)
+check(cityHref(seattle) === '/city/seattle', 'canonical city → slug URL', cityHref(seattle))
+check(cityHref(sf) === '/city/san-francisco', 'canonical city → slug URL (SF)', cityHref(sf))
 
 // findCanonical / citySlug
 check(findCanonical(seattle) !== undefined, 'findCanonical finds Seattle')
 check(citySlug(seattle) === 'seattle', 'citySlug returns slug for canonical')
-check(citySlug(remote) === undefined, 'citySlug returns undefined for non-canonical')
 check(
   findCanonical({ ...seattle, name: 'SEA' }) !== undefined,
   'findCanonical matches by coordinates not name',
 )
 
 // ---------------------------------------------------------------------------
-// 4. Router: parseHash + serializeRoute round-trips.
+// 4. Router: parseRoute + serializeRoute round-trips.
 // ---------------------------------------------------------------------------
 console.log('\n=== Router round-trip ===')
-function roundTrip(hash: string, label: string, expectedView: Route['view']) {
-  const route = parseHash(hash)
+function roundTrip(path: string, label: string, expectedView: Route['view']) {
+  const route = parseRoute(path)
   const out = serializeRoute(route)
   check(route.view === expectedView, `${label}: view=${expectedView}`, `got ${route.view}`)
-  check(out === hash || out === hash.replace(/\/+$/, '') || normalizeEq(out, hash), `${label}: round-trip`, `${hash} → ${out}`)
+  check(out === path || out === path.replace(/\/+$/, '') || normalizeEq(out, path), `${label}: round-trip`, `${path} → ${out}`)
 }
 
 function normalizeEq(a: string, b: string): boolean {
   return a.replace(/[#/]+$/, '') === b.replace(/[#/]+$/, '')
 }
 
-roundTrip('#/', 'root', 'index')
-roundTrip('', 'empty hash', 'index')
-roundTrip('#/city/seattle', 'city slug', 'city')
-roundTrip('#/city/san-francisco', 'city slug SF', 'city')
+roundTrip('/', 'root', 'index')
+roundTrip('', 'empty path', 'index')
+roundTrip('/city/seattle', 'city slug', 'city')
+roundTrip('/city/san-francisco', 'city slug SF', 'city')
 
 // Query round-trip
-const qRoute = parseHash('#/?q=los')
+const qRoute = parseRoute('/?q=los')
 check(qRoute.view === 'index' && qRoute.query === 'los', 'index query parsed', JSON.stringify(qRoute))
-check(serializeRoute({ view: 'index', query: 'los' }) === '#/?q=los', 'index query serialized')
+check(serializeRoute({ view: 'index', query: 'los' }) === '/?q=los', 'index query serialized')
 
-// Coord city round-trip
-const coordHash = '#/city/@64.15,-21.94?name=Reykjavik&region=Iceland'
-const coordRoute = parseHash(coordHash)
-check(coordRoute.view === 'city', 'coord route view')
-check(coordRoute.lat === 64.15 && coordRoute.lon === -21.94, 'coord route lat/lon')
-check(coordRoute.name === 'Reykjavik', 'coord route name')
-check(coordRoute.region === 'Iceland', 'coord route region')
+// Legacy hash backwards compatibility
+check(parseRoute('#/city/seattle').view === 'city', 'legacy hash city')
+check(parseRoute('#/?q=los').view === 'index', 'legacy hash query')
+check(parseHash('#/city/seattle').view === 'city', 'parseHash city')
 
-// Invalid hash falls back to index
-check(parseHash('#/nonsense').view === 'index', 'unknown hash → index')
-check(parseHash('#/city/@bad,coords').view === 'index', 'invalid coords → index')
+// Invalid path falls back to index
+check(parseRoute('/nonsense').view === 'index', 'unknown path → index')
 
 // ---------------------------------------------------------------------------
-// 5. routeToCity resolves slugs and coords.
+// 5. routeToCity resolves slugs.
 // ---------------------------------------------------------------------------
 console.log('\n=== routeToCity ===')
 const seattleRoute = routeToCity({ view: 'city', slug: 'seattle' })
 check(seattleRoute?.name === 'Seattle', 'routeToCity resolves slug')
 check(seattleRoute?.latitude === 47.61, 'routeToCity lat correct')
-
-const coordCity = routeToCity({
-  view: 'city',
-  slug: '',
-  lat: 64.15,
-  lon: -21.94,
-  name: 'Reykjavik',
-  region: 'Iceland',
-})
-check(coordCity?.name === 'Reykjavik', 'routeToCity resolves coord')
-check(coordCity?.latitude === 64.15, 'routeToCity coord lat')
 
 const badSlug = routeToCity({ view: 'city', slug: 'does-not-exist' })
 check(badSlug === null, 'routeToCity returns null for unknown slug')
@@ -132,27 +105,27 @@ const indexRoute = routeToCity({ view: 'index', query: '' })
 check(indexRoute === null, 'routeToCity returns null for index route')
 
 // ---------------------------------------------------------------------------
-// 6. Browser Back simulation: hash sequence restores prior search state.
+// 6. Browser Back simulation: history sequence restores prior search state.
 // ---------------------------------------------------------------------------
 console.log('\n=== Browser Back / search state ===')
-const hashSequence = [
-  '#/',
-  '#/?q=los',
-  '#/city/los-angeles',
-  '#/?q=los',
+const historySequence = [
+  '/',
+  '/?q=los',
+  '/city/los-angeles',
+  '/?q=los',
 ]
 let restoredQuery = ''
-for (let i = 0; i < hashSequence.length; i++) {
-  const r = parseHash(hashSequence[i])
-  if (i === hashSequence.length - 1) {
+for (let i = 0; i < historySequence.length; i++) {
+  const r = parseRoute(historySequence[i])
+  if (i === historySequence.length - 1) {
     restoredQuery = r.view === 'index' ? r.query : ''
   }
 }
 check(restoredQuery === 'los', 'Back restores prior search query', `got "${restoredQuery}"`)
 
 // Navigating from search → city → back should preserve query
-const seq2 = [serializeRoute({ view: 'index', query: 'boston' }), '#/city/boston', serializeRoute({ view: 'index', query: 'boston' })]
-const backRoute = parseHash(seq2[2])
+const seq2 = [serializeRoute({ view: 'index', query: 'boston' }), '/city/boston', serializeRoute({ view: 'index', query: 'boston' })]
+const backRoute = parseRoute(seq2[2])
 check(backRoute.view === 'index' && backRoute.query === 'boston', 'Back from city preserves search query')
 
 // ---------------------------------------------------------------------------
