@@ -110,7 +110,7 @@ function App() {
             <svg className="brand-icon" aria-hidden="true">
               <use href="/icons.svg#brand-icon" />
             </svg>
-            Weatherfork
+            Weather ribbon
           </a>
           <a
             className="header-back"

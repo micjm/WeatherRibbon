@@ -21,7 +21,7 @@ function ok(cond: boolean, label: string) {
 // pure logic the React component uses, against a real jsdom DOM.
 // ---------------------------------------------------------------------------
 const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
-  url: 'https://weatherfork.test/',
+  url: 'https://weatherribbon.test/',
 })
 const { window } = dom
 

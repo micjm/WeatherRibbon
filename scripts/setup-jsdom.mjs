@@ -1,7 +1,7 @@
 import { JSDOM } from 'jsdom'
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', {
-  url: 'https://weatherfork.test/',
+  url: 'https://weatherribbon.test/',
   pretendToBeVisual: true,
 })
 
