@@ -1,32 +1,57 @@
-# React + TypeScript + Vite
+# Weather ribbon
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Climate charts for cities around the world. Each city page shows 30-year normals
+(1991–2020) for temperature, precipitation, snowfall, humidity, cloud cover, wind,
+daylight, and recent air quality, rendered as static SVG charts with no runtime API calls.
 
-Currently, two official plugins are available:
+Live at [weatherribbon.com](https://weatherribbon.com)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Data sources
 
-## React Compiler
+- Climate normals: [MERRA-2 via NASA POWER](https://power.larc.nasa.gov/)
+- Air quality: [CAMS Global via Open-Meteo](https://open-meteo.com/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+All data is pre-fetched into `data/` and committed, so the site is fully static.
 
-## Expanding the Oxlint configuration
+## Development
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Requires Node 24 (see `.nvmrc`).
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Other commands:
+
+| Command | What it does |
+| --- | --- |
+| `npm run build` | Typecheck and build to `dist/` |
+| `npm run lint` | Run oxlint |
+| `npm run validate` | Validate the city collection and data files |
+| `npm run ribbons` | Regenerate the ribbon thumbnails in `public/ribbons/` |
+| `npm run fetch:all` | Re-fetch climate and air-quality data |
+
+CI runs `lint`, `validate`, and `build` on every push.
+
+## Contributing
+
+Contributions are welcome. Bug reports, chart improvements, new cities, and
+data corrections are all useful.
+
+1. Open an [issue](https://github.com/micjm/WeatherRibbon/issues) to discuss anything non-trivial.
+2. Fork, branch, and make your change.
+3. Run `npm run lint`, `npm run validate`, and `npm run build` before opening a PR.
+
+Adding a city: add it to `src/cities.ts` (US) or `src/worldCities.ts`, fetch its data
+with `npm run fetch:climate -- --city <slug>` and `npm run fetch:aqi -- --city <slug>`,
+then run `npm run ribbons` to generate its thumbnail.
+
+## Sponsorship
+
+Weatherribbon was built using [Agent Duel](https://github.com/bottomless/agent-duel).
+Agent Duel supports the cost of hosting WeatherRibbon.com.
+
+## License
+
+[MIT](./LICENSE)

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type MouseEvent } from 'react'
 import { AirQualityChart } from './AirQualityChart'
 import { AqiCategoryDaysChart } from './AqiCategoryDaysChart'
 import { ClimateChart } from './ClimateChart'
@@ -18,6 +18,62 @@ import { loadCity, type CityData, type CityRef } from './dataService'
 import { useRoute } from './useRoute'
 import { parseRoute, routeToCity } from './router'
 import './App.css'
+
+const REPO_URL = 'https://github.com/micjm/WeatherRibbon'
+
+function goHome(
+  e: MouseEvent<HTMLAnchorElement>,
+  navigate: (route: { view: 'index'; query: string }) => void,
+) {
+  e.preventDefault()
+  navigate({ view: 'index', query: '' })
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <section className="contribute" aria-labelledby="contribute-title">
+        <h2 id="contribute-title">Contributions welcome</h2>
+        <p>
+          Found a bug, have an idea, or want to improve a chart?
+          Issues and pull requests are welcome.
+        </p>
+        <div className="contribute-links">
+          <a href={`${REPO_URL}/issues`} target="_blank" rel="noreferrer">
+            Open an issue
+          </a>
+          <a href={REPO_URL} target="_blank" rel="noreferrer">
+            Contribute on GitHub
+          </a>
+        </div>
+      </section>
+      <p>
+        <a href={REPO_URL} target="_blank" rel="noreferrer">
+          Open source
+        </a>
+        <span aria-hidden="true"> · </span>
+        Code licensed under{' '}
+        <a href={`${REPO_URL}/blob/HEAD/LICENSE`} target="_blank" rel="noreferrer">
+          MIT
+        </a>
+        <span aria-hidden="true"> · </span>
+        Climate from{' '}
+        <a href="https://power.larc.nasa.gov/" target="_blank" rel="noreferrer">
+          MERRA-2 (NASA POWER)
+        </a>
+        <span aria-hidden="true"> · </span>
+        Air quality from{' '}
+        <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">
+          CAMS (Open-Meteo)
+        </a>
+        <span aria-hidden="true"> · </span>
+        <a href={`${REPO_URL}/issues`} target="_blank" rel="noreferrer">
+          Issues
+        </a>
+      </p>
+    </footer>
+  )
+}
 
 function CityView({ city }: { city: CityRef }) {
   const [data, setData] = useState<CityData | null>(null)
@@ -133,33 +189,32 @@ function App() {
 
   return (
     <div className="shell">
-      {route.view !== 'index' && (
-        <header className="header">
+      <header className="header">
+        <a className="brand" href="/" onClick={(e) => goHome(e, navigate)}>
+          <svg className="brand-icon" aria-hidden="true">
+            <use href="/icons.svg#brand-icon" />
+          </svg>
+          Weather ribbon
+        </a>
+        <div className="header-end">
+          {route.view !== 'index' && (
+            <a className="header-back" href="/" onClick={(e) => goHome(e, navigate)}>
+              ← All cities
+            </a>
+          )}
           <a
-            className="brand"
-            href="/"
-            onClick={(e) => {
-              e.preventDefault()
-              navigate({ view: 'index', query: '' })
-            }}
+            className="header-repo"
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Weather ribbon on GitHub"
           >
-            <svg className="brand-icon" aria-hidden="true">
-              <use href="/icons.svg#brand-icon" />
+            <svg className="header-repo-icon" aria-hidden="true">
+              <use href="/icons.svg#github-icon" />
             </svg>
-            Weather ribbon
           </a>
-          <a
-            className="header-back"
-            href="/"
-            onClick={(e) => {
-              e.preventDefault()
-              navigate({ view: 'index', query: '' })
-            }}
-          >
-            ← All cities
-          </a>
-        </header>
-      )}
+        </div>
+      </header>
 
       <main className="main">
         {route.view === 'index' ? (
@@ -180,19 +235,14 @@ function App() {
             <h1>City not found</h1>
             <p>
               That city link is not available.{' '}
-              <a
-                href="/"
-                onClick={(e) => {
-                  e.preventDefault()
-                  navigate({ view: 'index', query: '' })
-                }}
-              >
+              <a href="/" onClick={(e) => goHome(e, navigate)}>
                 Browse all cities
               </a>
             </p>
           </article>
         )}
       </main>
+      <SiteFooter />
     </div>
   )
 }
