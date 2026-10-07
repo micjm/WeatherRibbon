@@ -1457,5 +1457,14 @@ export const WORLD_CITIES: WorldCity[] = [
     "population": 2042036,
     "latitude": 48.21,
     "longitude": 16.37
+  },
+  {
+    "slug": "katowice",
+    "name": "Katowice",
+    "region": "Silesian Voivodeship, Poland",
+    "country": "Poland",
+    "population": 286960,
+    "latitude": 50.26,
+    "longitude": 19.02
   }
 ]

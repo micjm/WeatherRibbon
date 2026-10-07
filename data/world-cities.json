@@ -5,7 +5,7 @@
   ],
   "description": "World cities: UN 2025 urban agglomerations (>5M) plus non-Chinese cities >2M (city proper)",
   "retrieved": "2026-08-21",
-  "count": 173,
+  "count": 174,
   "cities": [
     {
       "name": "Jakarta",
@@ -1478,6 +1478,15 @@
       "populationSource": "city proper (Wikipedia)",
       "source": "https://en.wikipedia.org/wiki/List_of_cities_with_over_1_million_inhabitants",
       "rank": 173
+    },
+    {
+      "name": "Katowice",
+      "country": "Poland",
+      "population": 286960,
+      "continent": "Europe",
+      "populationSource": "city proper (Wikipedia)",
+      "source": "https://en.wikipedia.org/wiki/Katowice",
+      "rank": 174
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs'
+import { WORLD_CITIES } from '../../src/worldCities.ts'
 
 // ---------------------------------------------------------------------------
 // Air Quality builder for all 100 featured U.S. cities
@@ -295,7 +296,10 @@ async function main() {
 
   let cities = CITIES
   if (cityFilter) {
-    cities = CITIES.filter((c) => c.slug === cityFilter || c.name.toLowerCase() === cityFilter.toLowerCase())
+    const worldCities = WORLD_CITIES.map((c) => ({
+      slug: c.slug, name: c.name, lat: c.latitude, lon: c.longitude,
+    }))
+    cities = [...CITIES, ...worldCities].filter((c) => c.slug === cityFilter || c.name.toLowerCase() === cityFilter.toLowerCase())
     if (cities.length === 0) {
       console.error(`City "${cityFilter}" not found.`)
       process.exit(1)
