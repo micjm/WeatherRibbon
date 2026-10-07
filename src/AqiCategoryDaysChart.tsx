@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { ChartPlaceholder } from './ChartPlaceholder'
 import { DataDetails } from './DataDetails'
 import type { CityRef } from './cities'
 import { AQI_CATEGORIES, useAirQuality } from './airQuality'
@@ -28,8 +29,11 @@ export function AqiCategoryDaysChart({
   const captionId = `${uid}-caption`
   const descId = `${uid}-desc`
 
-  const months = useAirQuality(city)
-  if (!months) return null
+  const { months, loading } = useAirQuality(city)
+  if (loading) {
+    return <ChartPlaceholder title="AQI category days by month" variant="bars" />
+  }
+  if (!months?.length) return null
   const n = months.length
   const slot = PLOT_W / n
   const barW = slot * 0.55

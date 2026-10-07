@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AirQualityChart } from './AirQualityChart'
 import { AqiCategoryDaysChart } from './AqiCategoryDaysChart'
 import { ClimateChart } from './ClimateChart'
+import { ChartPlaceholder } from './ChartPlaceholder'
 import { ClimateExtremes } from './ClimateExtremes'
 import { CloudCoverChart } from './CloudCoverChart'
 import { HourlyChart } from './HourlyChart'
@@ -20,7 +21,7 @@ import './App.css'
 
 function CityView({ city }: { city: CityRef }) {
   const [data, setData] = useState<CityData | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -46,46 +47,81 @@ function CityView({ city }: { city: CityRef }) {
 
   return (
     <>
-      {data ? (
-        <div className="weather">
-          <section className="card" aria-label="About this data">
-            <p className="eyebrow">{data.region}</p>
-            <h1>{data.name}</h1>
-            <p className="panel-note">
-              {data.source} &middot; {data.period}
-            </p>
-          </section>
-
-          <ClimateExtremes climate={data.climate} />
-          <SeasonalRibbonChart name={data.name} climate={data.climate} />
-          <HourlyChart name={data.name} hourlyTemp={data.hourlyTemp} />
-          <ClimateChart name={data.name} climate={data.climate} />
-          <PrecipChanceChart name={data.name} climate={data.climate} />
-          <RainfallChart name={data.name} climate={data.climate} />
-          <SnowfallChart name={data.name} climate={data.climate} />
-          <HumidityComfortChart name={data.name} climate={data.climate} />
-          <CloudCoverChart name={data.name} climate={data.climate} />
-
-          <AirQualityChart name={data.name} city={city} />
-          <AqiCategoryDaysChart name={data.name} city={city} />
-
-          <WindChart
-            name={data.name}
-            climate={data.climate}
-            windRose={data.windRose}
-          />
-          <DaylightChart name={data.name} latitude={data.latitude} />
-        </div>
-      ) : (
-        <article className="card muted">
-          <h1>{loading ? 'Loading…' : 'Could not load city'}</h1>
-          <p>
-            {loading
-              ? 'Fetching 1991–2020 ERA5 climate…'
-              : error ?? 'Unable to load this city.'}
+      <p className="sr-only" role="status">
+        {loading ? `Loading climate data for ${city.name}.` : ''}
+      </p>
+      <div className="weather" aria-busy={loading}>
+        <section className="card" aria-label="About this data">
+          <p className="eyebrow">{city.region}</p>
+          <h1>{city.name}</h1>
+          <p className="panel-note">
+            {data ? (
+              <>{data.source} &middot; {data.period}</>
+            ) : loading ? (
+              <span className="skeleton placeholder-source" aria-hidden="true" />
+            ) : 'Climate data unavailable.'}
           </p>
-        </article>
-      )}
+        </section>
+
+        {!loading && !data ? (
+          <article className="card" role="alert">
+            <h2 className="forecast-title">Could not load city</h2>
+            <p>{error || 'Unable to load this city.'}</p>
+          </article>
+        ) : (
+          <>
+            {data ? (
+              <>
+                <ClimateExtremes climate={data.climate} />
+                <SeasonalRibbonChart name={data.name} climate={data.climate} />
+                <HourlyChart name={data.name} hourlyTemp={data.hourlyTemp} />
+                <ClimateChart name={data.name} climate={data.climate} />
+                <PrecipChanceChart name={data.name} climate={data.climate} />
+                <RainfallChart name={data.name} climate={data.climate} />
+                <SnowfallChart name={data.name} climate={data.climate} />
+                <HumidityComfortChart name={data.name} climate={data.climate} />
+                <CloudCoverChart name={data.name} climate={data.climate} />
+              </>
+            ) : (
+              <>
+                <section className="climate-extremes" aria-hidden="true">
+                  <h2 className="climate-extremes-title">Climate extremes</h2>
+                  <ul className="climate-extremes-chips">
+                    {['Hottest', 'Wettest'].map((label) => (
+                      <li key={label}>
+                        <span className="climate-extremes-chip">
+                          <span className="climate-extremes-kind">{label}</span>
+                          <span className="skeleton placeholder-extreme" />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+                <ChartPlaceholder title="Seasonal Climate Ribbon" variant="ribbon" />
+                <ChartPlaceholder title="Average Hourly Temperature" variant="heatmap" />
+                <ChartPlaceholder title="Average High and Low Temperature" variant="line" />
+                <ChartPlaceholder title="Wet vs Dry Days" />
+                <ChartPlaceholder title="Monthly Rainfall" />
+                <ChartPlaceholder title="Monthly Snowfall" />
+                <ChartPlaceholder title="Dew Point Comfort" />
+                <ChartPlaceholder title="Sky Conditions" variant="line" />
+              </>
+            )}
+
+            <AirQualityChart name={city.name} city={city} />
+            <AqiCategoryDaysChart name={city.name} city={city} />
+
+            {data ? (
+              <WindChart
+                name={data.name}
+                climate={data.climate}
+                windRose={data.windRose}
+              />
+            ) : <ChartPlaceholder title="Average Wind Speed" />}
+            <DaylightChart name={city.name} latitude={city.latitude} />
+          </>
+        )}
+      </div>
     </>
   )
 }

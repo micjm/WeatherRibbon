@@ -100,18 +100,25 @@ export async function loadAirQuality(city: CityRef): Promise<AirQualityMonth[] |
   return data.default.months
 }
 
-export function useAirQuality(city: CityRef): AirQualityMonth[] | null {
-  const [months, setMonths] = useState<AirQualityMonth[] | null>(null)
+export function useAirQuality(city: CityRef): {
+  months: AirQualityMonth[] | null
+  loading: boolean
+} {
+  const [state, setState] = useState<{
+    city: CityRef
+    months: AirQualityMonth[] | null
+    loading: boolean
+  }>(() => ({ city, months: null, loading: !!aqiSlug(city) }))
 
   useEffect(() => {
     let active = true
-    setMonths(null)
+    setState({ city, months: null, loading: !!aqiSlug(city) })
     void loadAirQuality(city).then(
       (data) => {
-        if (active) setMonths(data)
+        if (active) setState({ city, months: data, loading: false })
       },
       () => {
-        if (active) setMonths(null)
+        if (active) setState({ city, months: null, loading: false })
       },
     )
     return () => {
@@ -119,5 +126,7 @@ export function useAirQuality(city: CityRef): AirQualityMonth[] | null {
     }
   }, [city])
 
-  return months
+  return state.city === city
+    ? { months: state.months, loading: state.loading }
+    : { months: null, loading: !!aqiSlug(city) }
 }

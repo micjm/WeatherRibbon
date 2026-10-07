@@ -54,6 +54,77 @@
   box-shadow: var(--shadow);
 }
 
+.skeleton {
+  display: inline-block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--border);
+  vertical-align: middle;
+}
+
+.placeholder-source {
+  width: min(280px, 100%);
+}
+
+.placeholder-extreme {
+  width: 84px;
+  align-self: center;
+}
+
+.placeholder-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  min-height: 25.5px;
+  margin-bottom: 12px;
+}
+
+.placeholder-legend .skeleton {
+  width: 140px;
+  max-width: 40%;
+}
+
+.placeholder-fill {
+  fill: var(--border);
+}
+
+.placeholder-line {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+
+.placeholder-notes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0 6px;
+}
+
+.placeholder-notes .skeleton {
+  width: 80%;
+}
+
+.placeholder-notes .skeleton:last-child {
+  width: 110px;
+}
+
+@keyframes placeholder-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton,
+  .placeholder-plot {
+    animation: placeholder-pulse 1.8s ease-in-out infinite;
+  }
+}
+
 .eyebrow {
   margin: 0 0 8px;
   font-size: 13px;

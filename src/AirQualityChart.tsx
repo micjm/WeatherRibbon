@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { ChartPlaceholder } from './ChartPlaceholder'
 import { DataDetails } from './DataDetails'
 import type { CityRef } from './cities'
 import { AQI_CATEGORIES, aqiCategory, useAirQuality } from './airQuality'
@@ -31,8 +32,9 @@ export function AirQualityChart({
   const captionId = `${uid}-caption`
   const descId = `${uid}-desc`
 
-  const months = useAirQuality(city)
-  if (!months) return null
+  const { months, loading } = useAirQuality(city)
+  if (loading) return <ChartPlaceholder title="Air Quality" variant="line" />
+  if (!months?.length) return null
   const n = months.length
   const slot = PLOT_W / n
 
